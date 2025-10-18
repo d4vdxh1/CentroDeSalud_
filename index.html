@@ -200,6 +200,11 @@
                     <i class="fas fa-calendar-plus"></i> Agendar Turno
                   </a>
                 </li>
+                <li>
+                  <a class="dropdown-item" href="#" onclick="showView('registrar-consulta')">
+                    <i class="fas fa-notes-medical"></i> Registrar Consulta
+                  </a>
+                </li>
               </ul>
             </li>
             <li class="nav-item dropdown">
@@ -429,9 +434,14 @@
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Lista de Turnos</h5>
-            <button class="btn btn-primary btn-sm" onclick="showView('agendar-turno')">
-              <i class="fas fa-calendar-plus"></i> Nuevo Turno
-            </button>
+            <div>
+              <button class="btn btn-success btn-sm me-2" onclick="showView('registrar-consulta')">
+                <i class="fas fa-notes-medical"></i> Registrar Consulta
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="showView('agendar-turno')">
+                <i class="fas fa-calendar-plus"></i> Nuevo Turno
+              </button>
+            </div>
           </div>
           <div class="card-body">
             <div class="mb-3">
@@ -660,6 +670,51 @@
           </div>
           <div class="card-body">
             <p class="text-muted">Formulario para agendar turnos (próximamente)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vista de Registrar Consulta -->
+      <div id="view-registrar-consulta" class="content-view" style="display: none">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-notes-medical"></i> Registrar Nueva Consulta</h5>
+            <button class="btn btn-secondary btn-sm" onclick="showView('ver-turnos')">
+              <i class="fas fa-arrow-left"></i> Volver a Turnos
+            </button>
+          </div>
+          <div class="card-body">
+            <form id="formRegistrarConsulta" onsubmit="registrarConsulta(event)">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="turnoConsulta" class="form-label">Turno <span class="text-danger">*</span></label>
+                  <select class="form-select" id="turnoConsulta" required>
+                    <option value="">Seleccione un turno...</option>
+                  </select>
+                  <small class="text-muted">Seleccione el turno asociado a esta consulta</small>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="motivoConsulta" class="form-label">Motivo de Consulta <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="motivoConsulta" required placeholder="Ej: Control de rutina">
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="diagnosticoConsulta" class="form-label">Diagnóstico</label>
+                <textarea class="form-control" id="diagnosticoConsulta" rows="3" placeholder="Ingrese el diagnóstico médico"></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="notasConsulta" class="form-label">Notas Adicionales</label>
+                <textarea class="form-control" id="notasConsulta" rows="4" placeholder="Observaciones, indicaciones, tratamiento, etc."></textarea>
+              </div>
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" onclick="showView('ver-turnos')">
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-save"></i> Registrar Consulta
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
