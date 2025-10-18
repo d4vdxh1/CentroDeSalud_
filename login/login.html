@@ -1,196 +1,214 @@
 <!DOCTYPE html>
 <html lang="es" data-bs-theme="light">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Sistema de Gestión Centro de Salud</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-card {
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-        .login-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px 15px 0 0;
-            padding: 2rem;
-        }
-        .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            padding: 12px;
-            font-weight: 600;
-        }
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .login-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        max-width: 900px;
+        width: 100%;
+      }
+      .login-left {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+      .login-left i {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+      }
+      .login-right {
+        padding: 3rem;
+      }
+      .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+      }
+      .btn-login {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 0.75rem;
+        font-weight: 600;
+      }
+      .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-5">
-                <div class="card login-card">
-                    <div class="login-header text-center">
-                        <i class="bi bi-hospital fs-1 mb-3"></i>
-                        <h3 class="mb-0">Centro de Salud</h3>
-                        <p class="mb-0">Sistema de Gestión</p>
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="login-card">
+            <div class="row g-0">
+              <div class="col-md-5 login-left">
+                <i class="fas fa-hospital"></i>
+                <h2>Centro de Salud</h2>
+                <p class="lead">Sistema de Gestión</p>
+              </div>
+              <div class="col-md-7 login-right">
+                <h3 class="mb-4">Iniciar Sesión</h3>
+                <form id="loginForm">
+                  <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group">
+                      <span class="input-group-text">
+                        <i class="fas fa-envelope"></i>
+                      </span>
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        placeholder="correo@ejemplo.com"
+                        required
+                      />
                     </div>
-                    
-                    <div class="card-body p-4">
-                        <div id="alertContainer"></div>
-                        
-                        <form id="loginForm">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">
-                                    <i class="bi bi-envelope"></i> Email
-                                </label>
-                                <input 
-                                    type="email" 
-                                    class="form-control" 
-                                    id="email" 
-                                    placeholder="usuario@ejemplo.com"
-                                    required
-                                >
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="password" class="form-label">
-                                    <i class="bi bi-lock"></i> Contraseña
-                                </label>
-                                <div class="input-group">
-                                    <input 
-                                        type="password" 
-                                        class="form-control" 
-                                        id="password" 
-                                        placeholder="••••••••"
-                                        required
-                                    >
-                                    <button 
-                                        class="btn btn-outline-secondary" 
-                                        type="button" 
-                                        id="togglePassword"
-                                    >
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="rememberMe">
-                                <label class="form-check-label" for="rememberMe">
-                                    Recordarme
-                                </label>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary btn-login w-100" id="btnLogin">
-                                <span id="btnText">
-                                    <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
-                                </span>
-                                <span id="btnSpinner" class="d-none">
-                                    <span class="spinner-border spinner-border-sm me-2"></span>
-                                    Ingresando...
-                                </span>
-                            </button>
-                        </form>
-                        
-                        <div class="text-center mt-3">
-                            <small class="text-muted">
-                                <i class="bi bi-shield-check"></i> 
-                                Acceso seguro para funcionarios autorizados
-                            </small>
-                        </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <div class="input-group">
+                      <span class="input-group-text">
+                        <i class="fas fa-lock"></i>
+                      </span>
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        placeholder="Ingrese su contraseña"
+                        required
+                      />
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        onclick="togglePassword()"
+                      >
+                        <i class="fas fa-eye" id="toggleIcon"></i>
+                      </button>
                     </div>
+                  </div>
+                  <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember" />
+                    <label class="form-check-label" for="remember">Recordarme</label>
+                  </div>
+                  <div id="errorMessage" class="alert alert-danger d-none" role="alert"></div>
+                  <button type="submit" class="btn btn-primary btn-login w-100" id="loginBtn">
+                    <span id="loginText">Iniciar Sesión</span>
+                    <span id="loginSpinner" class="d-none">
+                      <span class="spinner-border spinner-border-sm me-2"></span>
+                      Ingresando...
+                    </span>
+                  </button>
+                </form>
+                <div class="text-center mt-4">
+                  <small class="text-muted">
+                    Acceso seguro para funcionarios autorizados
+                  </small>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../js/supabase-config.js"></script>
-    <script src="../js/supabase-auth.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Toggle password visibility
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password')
-            const icon = this.querySelector('i')
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text'
-                icon.classList.remove('bi-eye')
-                icon.classList.add('bi-eye-slash')
-            } else {
-                passwordInput.type = 'password'
-                icon.classList.remove('bi-eye-slash')
-                icon.classList.add('bi-eye')
-            }
-        })
+      // Configuración de Supabase
+      const SUPABASE_URL = "https://fccinrcbjekzyvalfcaq.supabase.co"
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZjY2lucmNiamVrenl2YWxmY2FxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA3MDc2OTUsImV4cCI6MjA3NjI4MzY5NX0.i80eCa5H6RV9dObiq2Ww-DRa1Gf8fLGVDImqdcQJrv4"
 
-        // Mostrar alerta
-        function showAlert(message, type = 'danger') {
-            const alertContainer = document.getElementById('alertContainer')
-            alertContainer.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    <i class="bi bi-${type === 'danger' ? 'exclamation-triangle' : 'check-circle'}"></i>
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+      // Verificar si ya hay sesión activa
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          window.location.href = "../index.html"
         }
+      })
 
-        // Manejar el envío del formulario
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault()
-            
-            const email = document.getElementById('email').value
-            const password = document.getElementById('password').value
-            const btnLogin = document.getElementById('btnLogin')
-            const btnText = document.getElementById('btnText')
-            const btnSpinner = document.getElementById('btnSpinner')
-            
-            // Deshabilitar botón y mostrar spinner
-            btnLogin.disabled = true
-            btnText.classList.add('d-none')
-            btnSpinner.classList.remove('d-none')
-            
-            // Intentar iniciar sesión
-            const result = await loginUser(email, password)
-            
-            if (result.success) {
-                showAlert('¡Inicio de sesión exitoso! Redirigiendo...', 'success')
-                setTimeout(() => {
-                    window.location.href = '../index.html'
-                }, 1500)
-            } else {
-                showAlert('Error: ' + result.error, 'danger')
-                btnLogin.disabled = false
-                btnText.classList.remove('d-none')
-                btnSpinner.classList.add('d-none')
-            }
-        })
+      // Manejar el formulario de login
+      document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault()
 
-        // Verificar si ya hay una sesión activa
-        window.addEventListener('load', async () => {
-            const session = await checkAuth()
-            if (session) {
-                window.location.href = '../index.html'
-            }
-        })
+        const email = document.getElementById("email").value
+        const password = document.getElementById("password").value
+        const errorMessage = document.getElementById("errorMessage")
+        const loginBtn = document.getElementById("loginBtn")
+        const loginText = document.getElementById("loginText")
+        const loginSpinner = document.getElementById("loginSpinner")
+
+        // Mostrar spinner
+        loginText.classList.add("d-none")
+        loginSpinner.classList.remove("d-none")
+        loginBtn.disabled = true
+        errorMessage.classList.add("d-none")
+
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password,
+          })
+
+          if (error) throw error
+
+          // Login exitoso
+          console.log("Login exitoso:", data)
+          window.location.href = "../index.html"
+        } catch (error) {
+          console.error("Error de login:", error)
+          errorMessage.textContent = error.message || "Error al iniciar sesión"
+          errorMessage.classList.remove("d-none")
+
+          // Ocultar spinner
+          loginText.classList.remove("d-none")
+          loginSpinner.classList.add("d-none")
+          loginBtn.disabled = false
+        }
+      })
+
+      // Toggle password visibility
+      function togglePassword() {
+        const passwordInput = document.getElementById("password")
+        const toggleIcon = document.getElementById("toggleIcon")
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text"
+          toggleIcon.classList.remove("fa-eye")
+          toggleIcon.classList.add("fa-eye-slash")
+        } else {
+          passwordInput.type = "password"
+          toggleIcon.classList.remove("fa-eye-slash")
+          toggleIcon.classList.add("fa-eye")
+        }
+      }
     </script>
-</body>
+  </body>
 </html>
