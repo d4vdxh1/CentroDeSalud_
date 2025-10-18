@@ -83,6 +83,9 @@ function showView(viewName) {
       case "ver-usuarios":
         cargarUsuarios()
         break
+      case "registrar-consulta":
+        cargarTurnosParaConsulta()
+        break
     }
   }
 }
@@ -597,4 +600,95 @@ function verDetalleProfesional(id) {
 
 function verDetalleUsuario(id) {
   alert(`Ver detalle del usuario ID: ${id}`)
+}
+
+// Función para cargar turnos disponibles para registrar consulta
+async function cargarTurnosParaConsulta() {
+  const select = document.getElementById("turnoConsulta")
+  select.innerHTML = '<option value="">Cargando turnos...</option>'
+
+  try {
+    // Get turnos that are confirmed and don't have a consultation yet
+    const { data: turnos, error } = await window.supabase
+      .from("TURNOS")
+      .select(
+        `
+        ID_TURNO,
+        FECHA_HORA,
+        PACIENTES(NOMBRE, APELLIDO),
+        PROFESIONALES(NOMBRE, APELLIDO),
+        TIPOS_CONSULTAS(TIPO_CONSULTA)
+      `,
+      )
+      .eq("ESTADO", "C")
+      .order("FECHA_HORA", { ascending: false })
+      .limit(50)
+
+    if (error) throw error
+
+    // Filter out turnos that already have consultations
+    const { data: consultas, error: consultasError } = await window.supabase.from("CONSULTAS").select("ID_TURNO")
+
+    if (consultasError) throw consultasError
+
+    const turnosConConsulta = new Set(consultas.map((c) => c.ID_TURNO))
+    const turnosSinConsulta = turnos.filter((t) => !turnosConConsulta.has(t.ID_TURNO))
+
+    if (turnosSinConsulta.length === 0) {
+      select.innerHTML = '<option value="">No hay turnos disponibles para registrar consulta</option>'
+      return
+    }
+
+    select.innerHTML =
+      '<option value="">Seleccione un turno...</option>' +
+      turnosSinConsulta
+        .map(
+          (t) => `
+        <option value="${t.ID_TURNO}">
+          Turno #${t.ID_TURNO} - ${t.PACIENTES?.NOMBRE || ""} ${t.PACIENTES?.APELLIDO || ""} - 
+          ${new Date(t.FECHA_HORA).toLocaleString("es-AR")} - 
+          ${t.TIPOS_CONSULTAS?.TIPO_CONSULTA || ""}
+        </option>
+      `,
+        )
+        .join("")
+  } catch (error) {
+    console.error("[v0] Error al cargar turnos para consulta:", error)
+    select.innerHTML = '<option value="">Error al cargar turnos</option>'
+  }
+}
+
+// Función para registrar una nueva consulta
+async function registrarConsulta(event) {
+  event.preventDefault()
+
+  const idTurno = document.getElementById("turnoConsulta").value
+  const motivo = document.getElementById("motivoConsulta").value
+  const diagnostico = document.getElementById("diagnosticoConsulta").value
+  const notas = document.getElementById("notasConsulta").value
+
+  if (!idTurno) {
+    alert("Por favor seleccione un turno")
+    return
+  }
+
+  try {
+    const { data, error } = await window.supabase.from("CONSULTAS").insert([
+      {
+        ID_TURNO: Number.parseInt(idTurno),
+        MOTIVO: motivo,
+        DIAGNOSTICO: diagnostico || null,
+        NOTAS: notas || null,
+      },
+    ])
+
+    if (error) throw error
+
+    alert("Consulta registrada exitosamente")
+    document.getElementById("formRegistrarConsulta").reset()
+    showView("ver-consultas")
+  } catch (error) {
+    console.error("[v0] Error al registrar consulta:", error)
+    alert("Error al registrar la consulta: " + error.message)
+  }
 }
