@@ -6,6 +6,22 @@ const SUPABASE_ANON_KEY =
 // Inicializar el cliente de Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+// Verificar conexión
+async function verificarConexion() {
+  try {
+    const { data, error } = await supabase.from("PACIENTES").select("count")
+    if (error) {
+      console.error("Error de conexión:", error)
+      return false
+    }
+    console.log("✅ Conexión exitosa con Supabase")
+    return true
+  } catch (err) {
+    console.error("Error al verificar conexión:", err)
+    return false
+  }
+}
+
 // Verificar si el usuario está autenticado
 async function checkAuth() {
   const {
