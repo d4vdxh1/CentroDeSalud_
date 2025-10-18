@@ -1,6 +1,5 @@
 // Variables globales
 let currentUser = null
-const supabase = null // Declare supabase variable
 
 // Funciones de importación o declaración
 async function verificarConexion() {
@@ -19,6 +18,11 @@ async function checkAuth() {
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("[v0] Iniciando aplicación...")
 
+  if (!window.supabase) {
+    alert("Error: Supabase no está cargado correctamente. Verifica que supabase-config.js esté incluido.")
+    return
+  }
+
   // Verificar conexión con Supabase
   const conexionOk = await verificarConexion()
   if (!conexionOk) {
@@ -33,10 +37,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("userName").textContent = currentUser.email
     document.getElementById("dashboardUserName").textContent = currentUser.email
   } else {
-    // Si no hay sesión, permitir acceso de prueba
-    console.log("[v0] Modo de prueba - sin autenticación")
-    document.getElementById("userName").textContent = "Usuario de Prueba"
-    document.getElementById("dashboardUserName").textContent = "Usuario de Prueba"
+    console.log("[v0] No hay sesión activa, redirigiendo al login...")
+    window.location.href = "login/login.html"
+    return
   }
 
   // Cargar tema guardado
@@ -88,12 +91,14 @@ function showView(viewName) {
 async function cargarDashboard() {
   try {
     // Total de pacientes
-    const { count: totalPacientes } = await supabase.from("PACIENTES").select("*", { count: "exact", head: true })
+    const { count: totalPacientes } = await window.supabase
+      .from("PACIENTES")
+      .select("*", { count: "exact", head: true })
     document.getElementById("totalPacientes").textContent = totalPacientes || 0
 
     // Turnos de hoy
     const hoy = new Date().toISOString().split("T")[0]
-    const { count: turnosHoy } = await supabase
+    const { count: turnosHoy } = await window.supabase
       .from("TURNOS")
       .select("*", { count: "exact", head: true })
       .gte("FECHA_HORA", hoy + " 00:00:00")
@@ -101,13 +106,13 @@ async function cargarDashboard() {
     document.getElementById("turnosHoy").textContent = turnosHoy || 0
 
     // Total de profesionales
-    const { count: totalProfesionales } = await supabase
+    const { count: totalProfesionales } = await window.supabase
       .from("PROFESIONALES")
       .select("*", { count: "exact", head: true })
     document.getElementById("totalProfesionales").textContent = totalProfesionales || 0
 
     // Stock bajo (menos de 10 unidades)
-    const { count: stockBajo } = await supabase
+    const { count: stockBajo } = await window.supabase
       .from("STOCK_FARMACIA")
       .select("*", { count: "exact", head: true })
       .lt("CANTIDAD", 10)
@@ -130,7 +135,7 @@ async function cargarPacientes() {
   `
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await window.supabase
       .from("PACIENTES")
       .select("*")
       .order("ID_PACIENTE", { ascending: false })
@@ -194,7 +199,7 @@ async function cargarTurnos() {
   `
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await window.supabase
       .from("TURNOS")
       .select(
         `
@@ -267,7 +272,7 @@ async function cargarConsultas() {
   `
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await window.supabase
       .from("CONSULTAS")
       .select("*")
       .order("ID_CONSULTAS", { ascending: false })
@@ -329,7 +334,7 @@ async function cargarProfesionales() {
   `
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await window.supabase
       .from("PROFESIONALES")
       .select(
         `
@@ -400,7 +405,7 @@ async function cargarMedicamentos() {
   `
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await window.supabase
       .from("STOCK_FARMACIA")
       .select(
         `
@@ -466,7 +471,7 @@ async function cargarUsuarios() {
   `
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await window.supabase
       .from("USUARIOS")
       .select(
         `
@@ -559,11 +564,18 @@ function setTheme(theme) {
 
 // Función de logout
 async function logout() {
-  const { error } = await supabase.auth.signOut()
-  if (error) {
-    console.error("Error al cerrar sesión:", error)
+  try {
+    const { error } = await window.supabase.auth.signOut()
+    if (error) {
+      console.error("Error al cerrar sesión:", error)
+    }
+    // Redirigir al login
+    window.location.href = "login/login.html"
+  } catch (err) {
+    console.error("Error en logout:", err)
+    // Forzar redirección aunque haya error
+    window.location.href = "login/login.html"
   }
-  window.location.href = "/login/login.html"
 }
 
 // Funciones placeholder para ver detalles
