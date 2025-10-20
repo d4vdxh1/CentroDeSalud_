@@ -24,8 +24,12 @@ async function verificarConexion() {
 async function checkAuth() {
   // Implementación de checkAuth
   // Esto es un placeholder. Debes implementar la lógica real aquí.
-  return { user: { email: "test@example.com" } } // Retorna una sesión simulada
-}
+    const {
+      data: { session },
+    } = await window.supabase.auth.getSession()
+    return session
+    return { user: { email: "test@example.com" } } // Retorna una sesión simulada
+  }
 
 // Inicializar la aplicación
 document.addEventListener("DOMContentLoaded", async () => {
