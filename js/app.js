@@ -6,6 +6,18 @@ const bootstrap = window.bootstrap // Declare the bootstrap variable
 async function verificarConexion() {
   // Implementación de verificarConexion
   // Esto es un placeholder. Debes implementar la lógica real aquí.
+  try {
+    const { data, error } = await window.supabase.from("PACIENTES").select("count", { count: "exact", head: true })
+    if (error) {
+      console.error("Error de conexión:", error)
+      return false
+    }
+    console.log("✅ Conexión exitosa con Supabase")
+    return true
+  } catch (err) {
+    console.error("Error al verificar conexión:", err)
+    return false
+  }
   return true // Retorna true si la conexión es exitosa
 }
 
